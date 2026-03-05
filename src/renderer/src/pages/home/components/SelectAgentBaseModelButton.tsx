@@ -30,6 +30,15 @@ interface Props {
   containerClassName?: string
 }
 
+// Helper to extract provider and model id from full format "provider:model_id"
+const parseModelId = (modelId: string): { provider?: string; modelId: string } => {
+  if (modelId.includes(':')) {
+    const parts = modelId.split(':')
+    return { provider: parts[0], modelId: parts.slice(1).join(':') }
+  }
+  return { modelId }
+}
+
 const SelectAgentBaseModelButton: FC<Props> = ({
   agentBase: agent,
   onSelect,
@@ -43,7 +52,9 @@ const SelectAgentBaseModelButton: FC<Props> = ({
   containerClassName
 }) => {
   const { t } = useTranslation()
-  const model = useModel(agent?.model)
+  // Parse the model ID to extract provider and model id
+  const { provider, modelId: parsedModelId } = parseModelId(agent?.model || '')
+  const model = useModel(parsedModelId, provider)
 
   if (!agent) return null
 
@@ -52,7 +63,9 @@ const SelectAgentBaseModelButton: FC<Props> = ({
       model: model,
       filter: agentModelFilter
     })
-    if (selectedModel && selectedModel.id !== agent.model) {
+    // Compare using parsed model id to handle both "model_id" and "provider:model_id" formats
+    const currentModelId = parsedModelId
+    if (selectedModel && selectedModel.id !== currentModelId) {
       // Convert Model to ApiModel format
       const apiModel: ApiModel = {
         id: selectedModel.id,

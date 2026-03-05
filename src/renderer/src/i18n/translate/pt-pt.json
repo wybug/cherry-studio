@@ -77,6 +77,18 @@
         "failed": "Falha ao listar agentes."
       }
     },
+    "multiagent": {
+      "add": {
+        "description": "[to be translated]:Handle complex tasks with coordinated sub-agents",
+        "title": "[to be translated]:Add Multi-Agent"
+      },
+      "subAgents": {
+        "label": "[to be translated]:Sub Agents",
+        "placeholder": "[to be translated]:Select sub agents",
+        "selected": "[to be translated]:{{count}} sub-agent(s) selected",
+        "tooltip": "[to be translated]:Select agents that can be delegated tasks by this multi-agent."
+      }
+    },
     "server": {
       "error": {
         "not_running": "O servidor de API está habilitado, mas não está funcionando corretamente."
@@ -223,6 +235,11 @@
         "uninstalling": "Desinstalando..."
       },
       "prompt": "Configurações de Prompt",
+      "subAgents": {
+        "tab": "[to be translated]:Sub Agents",
+        "title": "[to be translated]:Sub Agents",
+        "tooltip": "[to be translated]:Select agents that can be delegated tasks by this agent."
+      },
       "tooling": {
         "mcp": {
           "description": "Conecte servidores MCP para desbloquear ferramentas adicionais que você pode aprovar acima.",

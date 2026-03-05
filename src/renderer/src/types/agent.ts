@@ -84,6 +84,9 @@ export const AgentBaseSchema = z.object({
   allowed_tools: z.array(z.string()).optional(), // Array of allowed tool IDs (whitelist)
   slash_commands: z.array(SlashCommandSchema).optional(), // Array of slash commands merged from builtin and SDK
 
+  // Sub-agents
+  sub_agent_id_list: z.array(z.string()).optional(), // Array of sub-agent IDs
+
   // Configuration
   configuration: AgentConfigurationSchema.optional() // Extensible settings like temperature, top_p, etc.
 })
@@ -206,6 +209,7 @@ export type BaseAgentForm = {
   accessible_paths: string[]
   allowed_tools: string[]
   mcps?: string[]
+  sub_agent_id_list?: string[]
   configuration?: AgentConfiguration
 }
 

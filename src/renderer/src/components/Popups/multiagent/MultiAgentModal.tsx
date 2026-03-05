@@ -1,3 +1,10 @@
+/**
+ * MultiAgentModal - Modal for creating Multi-Agent configurations
+ *
+ * A Multi-Agent is a primary agent that can delegate tasks to sub-agents.
+ * This modal allows selecting existing agents as sub-agents for the main agent.
+ */
+
 import { loggerService } from '@logger'
 import { ErrorBoundary } from '@renderer/components/ErrorBoundary'
 import { HelpTooltip } from '@renderer/components/TooltipIcons'
@@ -26,19 +33,20 @@ import styled from 'styled-components'
 
 const { TextArea } = Input
 
-const logger = loggerService.withContext('AddAgentPopup')
+const logger = loggerService.withContext('MultiAgentModal')
 
 type AgentWithTools = AgentEntity & { tools?: Tool[] }
 
-const buildAgentForm = (existing?: AgentWithTools): BaseAgentForm => ({
+const buildMultiAgentForm = (existing?: AgentWithTools): BaseAgentForm => ({
   type: existing?.type ?? 'claude-code',
-  name: existing?.name ?? 'Agent',
+  name: existing?.name ?? 'Multi-Agent',
   description: existing?.description,
   instructions: existing?.instructions,
   model: existing?.model ?? '',
   accessible_paths: existing?.accessible_paths ? [...existing.accessible_paths] : [],
   allowed_tools: existing?.allowed_tools ? [...existing.allowed_tools] : [],
   mcps: existing?.mcps ? [...existing.mcps] : [],
+  sub_agent_id_list: existing?.sub_agent_id_list ? [...existing.sub_agent_id_list] : [],
   configuration: AgentConfigurationSchema.parse(existing?.configuration ?? {})
 })
 
@@ -55,16 +63,16 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
   const { t } = useTranslation()
   const [open, setOpen] = useState(true)
   const loadingRef = useRef(false)
-  const { addAgent } = useAgents()
+  const { addAgent, agents } = useAgents()
   const { updateAgent } = useUpdateAgent()
   const isEditing = (agent?: AgentWithTools) => agent !== undefined
 
-  const [form, setForm] = useState<BaseAgentForm>(() => buildAgentForm(agent))
+  const [form, setForm] = useState<BaseAgentForm>(() => buildMultiAgentForm(agent))
   const [gitBashPathInfo, setGitBashPathInfo] = useState<GitBashPathInfo>({ path: null, source: null })
 
   useEffect(() => {
     if (open) {
-      setForm(buildAgentForm(agent))
+      setForm(buildMultiAgentForm(agent))
     }
   }, [agent, open])
 
@@ -114,7 +122,6 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
 
   const handleResetGitBash = useCallback(async () => {
     try {
-      // Clear manual setting and re-run auto-discovery
       await window.api.system.setGitBashPath(null)
       await checkGitBash()
     } catch (error) {
@@ -152,13 +159,6 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
     }))
   }, [])
 
-  // const onDescChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
-  //   setForm((prev) => ({
-  //     ...prev,
-  //     description: e.target.value
-  //   }))
-  // }, [])
-
   const onInstChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
     setForm((prev) => ({
       ...prev,
@@ -195,6 +195,13 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
     }))
   }, [])
 
+  const onSubAgentChange = useCallback((subAgentIds: string[]) => {
+    setForm((prev) => ({
+      ...prev,
+      sub_agent_id_list: subAgentIds
+    }))
+  }, [])
+
   // Create a temporary agentBase object for SelectAgentBaseModelButton
   const tempAgentBase: AgentEntity = useMemo(
     () => ({
@@ -219,6 +226,11 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
     setForm((prev) => ({ ...prev, model: fullModelId }))
   }, [])
 
+  // Get available agents for sub-agent selection (exclude current agent)
+  const availableSubAgents = useMemo(() => {
+    return agents.filter((a) => a.id !== agent?.id).map((a) => ({ label: a.name, value: a.id }))
+  }, [agents, agent?.id])
+
   const onCancel = () => {
     setOpen(false)
   }
@@ -236,7 +248,6 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
 
       loadingRef.current = true
 
-      // Additional validation check besides native HTML validation to ensure security
       if (!isAgentType(form.type)) {
         window.toast.error(t('agent.add.error.invalid_agent'))
         loadingRef.current = false
@@ -274,12 +285,13 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
           model: form.model,
           accessible_paths: [...form.accessible_paths],
           allowed_tools: [...form.allowed_tools],
+          sub_agent_id_list: form.sub_agent_id_list ? [...form.sub_agent_id_list] : [],
           configuration: form.configuration ? { ...form.configuration } : undefined
         } satisfies UpdateAgentForm
 
         const result = await updateAgent(updatePayload)
         if (result) {
-          logger.debug('Updated agent', result)
+          logger.debug('Updated multi-agent', result)
           afterSubmit?.(result)
         } else {
           logger.error('Update failed.')
@@ -293,6 +305,7 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
           model: form.model,
           accessible_paths: [...form.accessible_paths],
           allowed_tools: [...form.allowed_tools],
+          sub_agent_id_list: form.sub_agent_id_list ? [...form.sub_agent_id_list] : [],
           configuration: form.configuration ? { ...form.configuration } : undefined
         } satisfies AddAgentForm
         const result = await addAgent(newAgent)
@@ -314,6 +327,7 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
       form.description,
       form.instructions,
       form.allowed_tools,
+      form.sub_agent_id_list,
       form.configuration,
       agent,
       t,
@@ -324,18 +338,18 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
     ]
   )
 
-  AgentModalPopup.hide = onCancel
+  MultiAgentModalPopup.hide = onCancel
 
   return (
     <ErrorBoundary>
       <Modal
-        title={isEditing(agent) ? t('agent.edit.title') : t('agent.add.title')}
+        title={isEditing(agent) ? t('agent.edit.title') : t('agent.multiagent.add.title')}
         open={open}
         onCancel={onCancel}
         afterClose={onClose}
         transitionName="animation-move-down"
         centered
-        width={500}
+        width={560}
         footer={null}>
         <StyledForm onSubmit={onSubmit}>
           <FormContent>
@@ -460,10 +474,35 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
               <TextArea rows={3} value={form.instructions ?? ''} onChange={onInstChange} />
             </FormItem>
 
-            {/* <FormItem>
-              <Label>{t('common.description')}</Label>
-              <TextArea rows={1} value={form.description ?? ''} onChange={onDescChange} />
-            </FormItem> */}
+            {/* Sub-agents Selection */}
+            <FormItem>
+              <div className="flex items-center gap-2">
+                <Label>{t('agent.multiagent.subAgents.label', 'Sub Agents')}</Label>
+                <HelpTooltip
+                  title={t(
+                    'agent.multiagent.subAgents.tooltip',
+                    'Select agents that can be delegated tasks by this multi-agent.'
+                  )}
+                />
+              </div>
+              <Select
+                mode="multiple"
+                value={form.sub_agent_id_list || []}
+                onChange={onSubAgentChange}
+                options={availableSubAgents}
+                placeholder={t('agent.multiagent.subAgents.placeholder', 'Select sub agents')}
+                style={{ width: '100%' }}
+                allowClear
+              />
+              {form.sub_agent_id_list && form.sub_agent_id_list.length > 0 && (
+                <HelpText>
+                  {t('agent.multiagent.subAgents.selected', {
+                    count: form.sub_agent_id_list.length,
+                    defaultValue: '{{count}} sub-agent(s) selected'
+                  })}
+                </HelpText>
+              )}
+            </FormItem>
           </FormContent>
 
           <FormFooter>
@@ -482,9 +521,9 @@ const PopupContainer: React.FC<Props> = ({ agent, afterSubmit, resolve }) => {
   )
 }
 
-const TopViewKey = 'AgentModalPopup'
+const TopViewKey = 'MultiAgentModalPopup'
 
-export default class AgentModalPopup {
+export default class MultiAgentModalPopup {
   static topviewId = 0
   static hide() {
     TopView.hide(TopViewKey)
@@ -505,13 +544,10 @@ export default class AgentModalPopup {
   }
 }
 
-// Keep the old export for backward compatibility during migration
-export const AgentModal = AgentModalPopup
-
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 16px
 `
 
 const FormContent = styled.div`
@@ -534,13 +570,13 @@ const FormContent = styled.div`
 
 const FormRow = styled.div`
   display: flex;
-  gap: 12px;
+  gap: 12px
 `
 
 const FormItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 8px
 `
 
 const GitBashInputWrapper = styled.div`

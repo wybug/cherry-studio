@@ -44,7 +44,8 @@ export abstract class BaseService {
     'configuration',
     'accessible_paths',
     'allowed_tools',
-    'slash_commands'
+    'slash_commands',
+    'sub_agent_id_list'
   ]
 
   public async listMcpTools(

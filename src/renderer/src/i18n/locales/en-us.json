@@ -77,6 +77,18 @@
         "failed": "Failed to list agents."
       }
     },
+    "multiagent": {
+      "add": {
+        "description": "Handle complex tasks with coordinated sub-agents",
+        "title": "Add Multi-Agent"
+      },
+      "subAgents": {
+        "label": "Sub Agents",
+        "placeholder": "Select sub agents",
+        "selected": "{{count}} sub-agent(s) selected",
+        "tooltip": "Select agents that can be delegated tasks by this multi-agent."
+      }
+    },
     "server": {
       "error": {
         "not_running": "The API server is enabled but not running properly."
@@ -223,6 +235,11 @@
         "uninstalling": "Uninstalling..."
       },
       "prompt": "Prompt Settings",
+      "subAgents": {
+        "tab": "Sub Agents",
+        "title": "Sub Agents",
+        "tooltip": "Select agents that can be delegated tasks by this agent."
+      },
       "tooling": {
         "mcp": {
           "description": "Connect MCP servers to unlock additional tools you can approve above.",

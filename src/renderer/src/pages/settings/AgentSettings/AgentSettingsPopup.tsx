@@ -10,6 +10,7 @@ import EssentialSettings from './components/EssentialSettings'
 import PermissionModeSettings from './components/PermissionModeSettings'
 import { InstalledPluginsSettings, PluginBrowserSettings } from './components/PluginsSettings/PluginsSettings'
 import PromptSettings from './components/PromptSettings'
+import SubAgentsSetting from './components/SubAgentsSetting'
 import ToolsSettings from './components/ToolsSettings'
 import { AgentLabel } from './shared'
 
@@ -33,6 +34,7 @@ const AgentSettingPopupContainer: React.FC<AgentSettingPopupParams> = ({ tab, ag
       { key: 'prompt', label: t('agent.settings.prompt') },
       { key: 'permission-mode', label: t('agent.settings.permissionMode.tab', 'Permission Mode') },
       { key: 'tools-mcp', label: t('agent.settings.toolsMcp.tab', 'Tools & MCP') },
+      { key: 'sub-agents', label: t('agent.settings.subAgents.tab', 'Sub Agents') },
       { key: 'plugins', label: t('agent.settings.plugins.available.title', 'Available Plugins') },
       { key: 'installed', label: t('agent.settings.plugins.installed.title', 'Installed Plugins') },
       { key: 'advanced', label: t('agent.settings.advance.title', 'Advanced Settings') }
@@ -52,6 +54,8 @@ const AgentSettingPopupContainer: React.FC<AgentSettingPopupParams> = ({ tab, ag
         return <PermissionModeSettings agentBase={agent} update={updateAgent} />
       case 'tools-mcp':
         return <ToolsSettings agentBase={agent} update={updateAgent} />
+      case 'sub-agents':
+        return <SubAgentsSetting base={agent} update={updateAgent} />
       case 'plugins':
         return <PluginBrowserSettings agentBase={agent} update={updateAgent} />
       case 'installed':

@@ -77,6 +77,18 @@
         "failed": "エージェントの一覧取得に失敗しました。"
       }
     },
+    "multiagent": {
+      "add": {
+        "description": "[to be translated]:Handle complex tasks with coordinated sub-agents",
+        "title": "[to be translated]:Add Multi-Agent"
+      },
+      "subAgents": {
+        "label": "[to be translated]:Sub Agents",
+        "placeholder": "[to be translated]:Select sub agents",
+        "selected": "[to be translated]:{{count}} sub-agent(s) selected",
+        "tooltip": "[to be translated]:Select agents that can be delegated tasks by this multi-agent."
+      }
+    },
     "server": {
       "error": {
         "not_running": "APIサーバーは有効になっていますが、正常に動作していません。"
@@ -223,6 +235,11 @@
         "uninstalling": "アンインストール中..."
       },
       "prompt": "プロンプト設定",
+      "subAgents": {
+        "tab": "[to be translated]:Sub Agents",
+        "title": "[to be translated]:Sub Agents",
+        "tooltip": "[to be translated]:Select agents that can be delegated tasks by this agent."
+      },
       "tooling": {
         "mcp": {
           "description": "MCPサーバーを接続して、上で承認できる追加ツールを解放します。",

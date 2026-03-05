@@ -65,6 +65,7 @@ export class AgentService extends BaseService {
       small_model: req.small_model,
       configuration: serializedReq.configuration,
       accessible_paths: serializedReq.accessible_paths,
+      sub_agent_id_list: serializedReq.sub_agent_id_list,
       created_at: now,
       updated_at: now
     }

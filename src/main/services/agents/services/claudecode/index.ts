@@ -12,6 +12,7 @@ import type {
   SDKMessage,
   SdkPluginConfig
 } from '@anthropic-ai/claude-agent-sdk'
+import type { AgentDefinition } from '@anthropic-ai/claude-agent-sdk'
 import { query } from '@anthropic-ai/claude-agent-sdk'
 import { loggerService } from '@logger'
 import { config as apiConfigService } from '@main/apiServer/config'
@@ -27,6 +28,7 @@ import { app } from 'electron'
 
 import type { GetAgentSessionResponse } from '../..'
 import type { AgentServiceInterface, AgentStream, AgentStreamEvent } from '../../interfaces/AgentStreamInterface'
+import { multiAgentService } from '../MultiAgentService'
 import { sessionService } from '../SessionService'
 import { buildNamespacedToolCallId } from './claude-stream-state'
 import { promptForToolApproval } from './tool-permissions'
@@ -332,6 +334,16 @@ class ClaudeCodeService implements AgentServiceInterface {
       // options.forkSession = true
     }
 
+    // Build sub-agent definitions if configured
+    let agents: Record<string, AgentDefinition> = {}
+    const subAgentIdList = session.sub_agent_id_list
+    if (subAgentIdList && subAgentIdList.length > 0) {
+      agents = await multiAgentService.buildSubAgentDefinitions(session.agent_id, subAgentIdList)
+      if (Object.keys(agents).length > 0) {
+        options.agents = agents
+      }
+    }
+
     logger.info('Starting Claude Code SDK query', {
       prompt,
       cwd: options.cwd,
@@ -339,7 +351,9 @@ class ClaudeCodeService implements AgentServiceInterface {
       permissionMode: options.permissionMode,
       maxTurns: options.maxTurns,
       allowedTools: options.allowedTools,
-      resume: options.resume
+      resume: options.resume,
+      subAgentCount: Object.keys(agents).length,
+      subAgentIds: Object.keys(agents)
     })
 
     const { stream: userInputStream, close: closeUserStream } = this.createUserMessageStream(

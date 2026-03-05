@@ -7,11 +7,13 @@
 
 // Service classes
 export { AgentService } from './AgentService'
+export { MultiAgentService } from './MultiAgentService'
 export { SessionMessageService } from './SessionMessageService'
 export { SessionService } from './SessionService'
 
 // Service instances (singletons)
 export { agentService } from './AgentService'
+export { multiAgentService } from './MultiAgentService'
 export { sessionMessageService } from './SessionMessageService'
 export { sessionService } from './SessionService'
 

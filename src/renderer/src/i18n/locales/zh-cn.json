@@ -77,6 +77,18 @@
         "failed": "获取智能体列表失败"
       }
     },
+    "multiagent": {
+      "add": {
+        "description": "通过子Agent协同处理复杂任务",
+        "title": "添加 Multi-Agent"
+      },
+      "subAgents": {
+        "label": "子 Agent",
+        "placeholder": "选择子 Agent",
+        "selected": "{{count}} 个子 Agent 已选择",
+        "tooltip": "选择可以由此 Multi-Agent 委托任务的 Agent。"
+      }
+    },
     "server": {
       "error": {
         "not_running": "API 服务器已启用但未正常运行。"
@@ -223,6 +235,11 @@
         "uninstalling": "卸载中..."
       },
       "prompt": "提示词设置",
+      "subAgents": {
+        "tab": "子 Agent",
+        "title": "子 Agent",
+        "tooltip": "选择可以由此 Agent 委托任务的子 Agent。"
+      },
       "tooling": {
         "mcp": {
           "description": "连接 MCP 服务器即可解锁更多可在上方预先授权的工具。",

@@ -22,6 +22,8 @@ export const agentsTable = sqliteTable('agents', {
 
   configuration: text('configuration'), // JSON, extensible settings
 
+  sub_agent_id_list: text('sub_agent_id_list'), // sub agent id list(子agent的id列表，用|分开)
+
   created_at: text('created_at').notNull(),
   updated_at: text('updated_at').notNull()
 })

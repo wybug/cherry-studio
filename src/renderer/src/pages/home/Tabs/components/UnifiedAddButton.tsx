@@ -1,5 +1,6 @@
 import AddAssistantOrAgentPopup from '@renderer/components/Popups/AddAssistantOrAgentPopup'
 import AgentModalPopup from '@renderer/components/Popups/agent/AgentModal'
+import MultiAgentModalPopup from '@renderer/components/Popups/multiagent/MultiAgentModal'
 import { useApiServer } from '@renderer/hooks/useApiServer'
 import { useAppDispatch } from '@renderer/store'
 import { setActiveTopicOrSessionAction } from '@renderer/store/runtime'
@@ -56,6 +57,11 @@ const UnifiedAddButton: FC<UnifiedAddButtonProps> = ({ onCreateAssistant, setAct
         if (type === 'agent') {
           !apiServerRunning && startApiServer()
           AgentModalPopup.show({ afterSubmit: afterCreate })
+        }
+
+        if (type === 'multiagent') {
+          !apiServerRunning && startApiServer()
+          MultiAgentModalPopup.show({ afterSubmit: afterCreate })
         }
       }
     })
